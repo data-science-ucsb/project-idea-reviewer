@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -36,7 +37,7 @@ public class GoogleMembershipService implements MembershipService {
     final private String memberHostedDomain = "";
 
     @Autowired
-    private OAuth2AuthorizedClientService clientService;
+    private OAuth2AuthorizedClientService clientService; // TODO: Resolve issue with no OAuth2 Client bean injection
 
     @Autowired
     private AdminRepository adminRepository;
@@ -85,6 +86,7 @@ public class GoogleMembershipService implements MembershipService {
         if (token == null) {
             return false;
         }
+
         if (clientService == null) {
             logger.error(String.format("unable to obtain autowired clientService"));
             return false;
@@ -107,11 +109,7 @@ public class GoogleMembershipService implements MembershipService {
             return true;
         }
 
-        if (roleToTest.equals("member") && memberHostedDomain.equals(hostedDomain)) {
-            return true;
-        }
-
-        return false;
+        return roleToTest.equals("member") && memberHostedDomain.equals(hostedDomain);
     }
 
     private boolean isAdminEmail(String email) {
